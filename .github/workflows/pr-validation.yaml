@@ -1,30 +1,29 @@
-name: PR Validation
-
+name: pr-validation
 on:
   pull_request:
     branches:
-      - develop
-
+    - develop
 jobs:
-  lint:
+  lintingJob:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
-      - run: npm install htmlhint stylelint
-      - name: Lint HTML files
-        run: npx htmlhint "src/**/*.html"
-      - name: Lint CSS files
-        run: npx stylelint "styles/**/*.css"
-
+    - name: clone Repo
+      uses: actions/checkout@v4
+    - name: install html hint
+      run: npm install --save-dev htmlhint
+    - name: install css lint
+      run: npm install --save-dev stylelint
+    - name: linting html
+      run: npx htmlhint "**/*.html"
+    - name: linting style
+      run: npx stylelint "**/*.css"
   build:
     runs-on: ubuntu-latest
+    needs: lintingJob
     steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: npm install parcel
-      - name: Build project
-        run: npx parcel build src/index.html --no-minify
+    - name: clone Repo
+      uses: actions/checkout@v4
+    - name: installing parcel
+      run: npm install --save-dev parcel
+    - name: building using parser
+      run: npx parcel build "./src/index.html" --dist-dir "./dev" --public-url "./"
