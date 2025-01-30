@@ -1,27 +1,35 @@
-name: Deploy to Development
-
+name: deploy-development
 on:
   push:
     branches:
-      - develop
+    - develop
 
 jobs:
-  build:
+  BuildJob:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install dependencies
-        run: npm install parcel
-      - name: Build project
-        run: npx parcel build src/index.html --no-minify
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist
+    - name: Clone Repository
+      uses: actions/checkout@v4
 
-  deploy:
+    - name: Install dependencies
+      run: npm install --save-dev parcel
+
+    - name: Build static website
+      run: npx parcel build "./src/index.html" --dist-dir "./dist" --public-url "./"
+
+    - name: Upload artifacts
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./dist
+
+  DeployJob:
     runs-on: ubuntu-latest
-    needs: build
+
+    needs: BuildJob
+    environment: "development"
+    permissions:
+      pages: write
+      id-token: write
     steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
+    - name: Deploy to GitHub Pages
+      uses: actions/deploy-pages@v4
